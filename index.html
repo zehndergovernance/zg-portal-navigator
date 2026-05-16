@@ -93,10 +93,12 @@ header{background:rgba(11,31,18,.98);border-bottom:1px solid var(--border);paddi
     <div id="loginBox">
       <h2>Navigator-Zugang</h2>
       <p>Melden Sie sich mit Ihren Zugangsdaten an. Nach dem Kauf erhalten Sie per E-Mail einen Link zum Einrichten Ihres Passworts.</p>
-      <input type="email" id="emailInput" class="auth-input" placeholder="E-Mail-Adresse">
-      <input type="password" id="passwordInput" class="auth-input" placeholder="Passwort">
+      <form onsubmit="event.preventDefault();doLogin();return false;" autocomplete="on">
+      <input type="email" id="emailInput" name="email" autocomplete="email" required class="auth-input" placeholder="E-Mail-Adresse">
+      <input type="password" id="passwordInput" name="password" autocomplete="current-password" required class="auth-input" placeholder="Passwort">
       <div class="auth-err" id="authError"></div>
-      <button class="auth-btn" id="loginBtn" onclick="doLogin()">Einloggen →</button>
+      <button type="submit" class="auth-btn" id="loginBtn">Einloggen →</button>
+      </form>
       <span class="forgot-link" onclick="doForgotPassword()">Passwort vergessen?</span>
       <hr class="auth-divider">
       <div class="auth-info">Noch kein Navigator? <a href="https://buy.stripe.com/5kQ3cneRM2pz7M10wU5Rm02">Compliance Navigator — CHF 490 →</a></div>
