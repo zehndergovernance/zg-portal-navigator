@@ -117,6 +117,16 @@ header{background:rgba(11,31,18,.98);border-bottom:1px solid var(--border);paddi
       <p>Wir haben Ihnen einen Link gesendet. Bitte prüfen Sie Ihren Posteingang.</p>
       <button class="auth-btn" onclick="showLoginBox()">Zurück zum Login</button>
     </div>
+    <div id="setPasswordBox" style="display:none">
+      <h2>Willkommen bei Zehnder Governance</h2>
+      <p>Legen Sie einmalig Ihr Passwort fest, um Ihren Portal-Zugang zu aktivieren.</p>
+      <form onsubmit="event.preventDefault();doSetPassword();return false;" autocomplete="on">
+      <input type="password" id="newPwInput" name="new-password" autocomplete="new-password" required minlength="8" class="auth-input" placeholder="Neues Passwort (mind. 8 Zeichen)">
+      <input type="password" id="newPwInput2" name="new-password" autocomplete="new-password" required minlength="8" class="auth-input" placeholder="Passwort wiederholen">
+      <div class="auth-err" id="setPwError"></div>
+      <button type="submit" class="auth-btn" id="setPwBtn">Passwort festlegen →</button>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -180,8 +190,15 @@ const ALLOWED_PLANS = ['navigator']
 
 const { createClient } = supabase
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const _authHash = new URLSearchParams((window.location.hash || '').replace(/^#/, ''))
+const NEEDS_PW_SETUP = _authHash.get('type') === 'invite' || _authHash.get('type') === 'recovery'
 
 async function init() {
+  if (NEEDS_PW_SETUP) {
+    document.getElementById('loadingScreen').classList.add('hidden')
+    showSetPasswordBox()
+    return
+  }
   const { data: { session } } = await sb.auth.getSession()
   if (session) {
     document.getElementById('userEmail').textContent = session.user.email
@@ -235,6 +252,29 @@ function showLoginBox() {
   document.getElementById('resetBox').style.display = 'none'
 }
 
+function showSetPasswordBox() {
+  document.getElementById('authOverlay').classList.remove('hidden')
+  document.getElementById('loginBox').style.display = 'none'
+  document.getElementById('setPasswordBox').style.display = 'block'
+}
+async function doSetPassword() {
+  const p1 = document.getElementById('newPwInput').value
+  const p2 = document.getElementById('newPwInput2').value
+  const err = document.getElementById('setPwError')
+  const btn = document.getElementById('setPwBtn')
+  err.style.display = 'none'
+  if (p1.length < 8) { err.textContent = 'Passwort muss mindestens 8 Zeichen haben.'; err.style.display = 'block'; return }
+  if (p1 !== p2) { err.textContent = 'Die Passwörter stimmen nicht überein.'; err.style.display = 'block'; return }
+  btn.disabled = true; btn.textContent = 'Wird gespeichert...'
+  const { error } = await sb.auth.updateUser({ password: p1 })
+  if (error) { err.textContent = 'Konnte Passwort nicht speichern: ' + error.message; err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Passwort festlegen →'; return }
+  document.getElementById('setPasswordBox').style.display = 'none'
+  document.getElementById('loginBox').style.display = 'block'
+  const { data: { session } } = await sb.auth.getSession()
+  if (session) { document.getElementById('userEmail').textContent = session.user.email; await checkAccess(session.user.id) }
+  btn.disabled = false; btn.textContent = 'Passwort festlegen →'
+}
+
 async function doLogout() {
   await sb.auth.signOut()
   document.getElementById('authOverlay').classList.remove('hidden')
@@ -243,7 +283,7 @@ async function doLogout() {
   document.getElementById('userEmail').textContent = ''
 }
 
-document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !document.getElementById('authOverlay').classList.contains('hidden')) doLogin() })
+document.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !document.getElementById('authOverlay').classList.contains('hidden') && document.getElementById('loginBox').style.display !== 'none') doLogin() })
 init()
 </script>
 <!-- ZG Cookie Consent Banner v1 — Quick-Hinweis für technisch-notwendige Cookies (Supabase-Auth-Session) -->
