@@ -33,6 +33,9 @@ body{background:var(--ink);color:#fff;font-family:'Outfit',sans-serif;min-height
 .auth-info a{color:var(--gold);}
 .auth-divider{border:none;border-top:1px solid rgba(255,255,255,.08);margin:20px 0;}
 .forgot-link{font-size:12px;color:var(--gold);cursor:pointer;margin-top:12px;display:block;}
+.pwwrap{position:relative;}
+.pweye{position:absolute;right:10px;top:13px;background:none;border:0;padding:0;cursor:pointer;font-size:15px;line-height:1;opacity:.55;}
+.pweye:hover{opacity:.95;}
 .no-access-box{text-align:center;}
 .no-access-box .icon{font-size:48px;margin-bottom:16px;}
 .no-access-box h2{font-family:'Cormorant Garamond',serif;font-size:24px;color:#fff;margin-bottom:8px;}
@@ -95,7 +98,7 @@ header{background:rgba(11,31,18,.98);border-bottom:1px solid var(--border);paddi
       <p>Melden Sie sich mit Ihren Zugangsdaten an. Nach dem Kauf erhalten Sie per E-Mail einen Link zum Einrichten Ihres Passworts.</p>
       <form onsubmit="event.preventDefault();doLogin();return false;" autocomplete="on">
       <input type="email" id="emailInput" name="email" autocomplete="email" required class="auth-input" placeholder="E-Mail-Adresse">
-      <input type="password" id="passwordInput" name="password" autocomplete="current-password" required class="auth-input" placeholder="Passwort">
+      <div class="pwwrap"><input type="password" id="passwordInput" name="password" autocomplete="current-password" required class="auth-input" style="padding-right:38px" placeholder="Passwort"><button type="button" class="pweye" onclick="togglePw('passwordInput',this)" aria-label="Passwort anzeigen" tabindex="-1">👁</button></div>
       <div class="auth-err" id="authError"></div>
       <button type="submit" class="auth-btn" id="loginBtn">Einloggen →</button>
       </form>
@@ -121,8 +124,8 @@ header{background:rgba(11,31,18,.98);border-bottom:1px solid var(--border);paddi
       <h2>Willkommen bei Zehnder Governance</h2>
       <p>Legen Sie einmalig Ihr Passwort fest, um Ihren Portal-Zugang zu aktivieren.</p>
       <form onsubmit="event.preventDefault();doSetPassword();return false;" autocomplete="on">
-      <input type="password" id="newPwInput" name="new-password" autocomplete="new-password" required minlength="8" class="auth-input" placeholder="Neues Passwort (mind. 8 Zeichen)">
-      <input type="password" id="newPwInput2" name="new-password" autocomplete="new-password" required minlength="8" class="auth-input" placeholder="Passwort wiederholen">
+      <div class="pwwrap"><input type="password" id="newPwInput" name="new-password" autocomplete="new-password" required minlength="8" class="auth-input" style="padding-right:38px" placeholder="Neues Passwort (mind. 8 Zeichen)"><button type="button" class="pweye" onclick="togglePw('newPwInput',this)" aria-label="Passwort anzeigen" tabindex="-1">👁</button></div>
+      <div class="pwwrap"><input type="password" id="newPwInput2" name="new-password" autocomplete="new-password" required minlength="8" class="auth-input" style="padding-right:38px" placeholder="Passwort wiederholen"><button type="button" class="pweye" onclick="togglePw('newPwInput2',this)" aria-label="Passwort anzeigen" tabindex="-1">👁</button></div>
       <div class="auth-err" id="setPwError"></div>
       <button type="submit" class="auth-btn" id="setPwBtn">Passwort festlegen →</button>
       </form>
@@ -257,6 +260,7 @@ function showSetPasswordBox() {
   document.getElementById('loginBox').style.display = 'none'
   document.getElementById('setPasswordBox').style.display = 'block'
 }
+function togglePw(id,btn){const el=document.getElementById(id);const show=el.type==='password';el.type=show?'text':'password';btn.textContent=show?'🙈':'👁';btn.setAttribute('aria-label',show?'Passwort verbergen':'Passwort anzeigen');}
 async function doSetPassword() {
   const p1 = document.getElementById('newPwInput').value
   const p2 = document.getElementById('newPwInput2').value
