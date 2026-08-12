@@ -224,7 +224,7 @@ async function checkAccess(userId) {
 }
 
 async function doLogin() {
-  const email = document.getElementById('emailInput').value.trim()
+  const email = document.getElementById('emailInput').value.trim().toLowerCase()
   const password = document.getElementById('passwordInput').value
   const btn = document.getElementById('loginBtn')
   const err = document.getElementById('authError')
@@ -243,7 +243,7 @@ async function doLogin() {
 }
 
 async function doForgotPassword() {
-  const email = document.getElementById('emailInput').value.trim()
+  const email = document.getElementById('emailInput').value.trim().toLowerCase()
   if (!email) { alert('Bitte geben Sie Ihre E-Mail-Adresse ein.'); return }
   await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href })
   document.getElementById('loginBox').style.display = 'none'
